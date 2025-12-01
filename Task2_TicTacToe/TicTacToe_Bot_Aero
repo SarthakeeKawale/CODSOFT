@@ -91,6 +91,8 @@ def player_move():
 
 # main game loop
 def play_game():
+    global board  # Move this to the TOP of the function
+    
     print("Hey! I'm Aero (your gaming dude)")
     print('=== TIC-TAC-TOE ===')
     print('You are X, Aero is O')
@@ -132,8 +134,7 @@ def play_game():
     # ask to play again
     again = input('Play again? (y/n): ').lower()
     if again == 'y':
-        global board
-        board = [' ' for _ in range(9)]
+        board = [' ' for _ in range(9)]  # Reset the board
         play_game()
 
 if __name__ == '__main__':
