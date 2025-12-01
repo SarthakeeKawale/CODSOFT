@@ -1,0 +1,142 @@
+import math
+
+# the game board
+board = [' ' for _ in range(9)]
+
+def print_board():
+    print('\n')
+    print(f' {board[0]} | {board[1]} | {board[2]} ')
+    print('-----------')
+    print(f' {board[3]} | {board[4]} | {board[5]} ')
+    print('-----------')
+    print(f' {board[6]} | {board[7]} | {board[8]} ')
+    print('\n')
+
+def check_winner(b, player):
+    # all possible winning combinations
+    wins = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # columns
+        [0, 4, 8], [2, 4, 6]              # diagonals
+    ]
+    
+    for win in wins:
+        if b[win[0]] == b[win[1]] == b[win[2]] == player:
+            return True
+    return False
+
+def is_board_full(b):
+    return ' ' not in b
+
+def get_empty_spots(b):
+    return [i for i, spot in enumerate(b) if spot == ' ']
+
+# minimax algorithm - makes AI unbeatable
+def minimax(b, depth, is_maximizing):
+    # check terminal states
+    if check_winner(b, 'O'):
+        return 10 - depth
+    if check_winner(b, 'X'):
+        return depth - 10
+    if is_board_full(b):
+        return 0
+    
+    if is_maximizing:
+        best_score = -math.inf
+        for spot in get_empty_spots(b):
+            b[spot] = 'O'
+            score = minimax(b, depth + 1, False)
+            b[spot] = ' '
+            best_score = max(score, best_score)
+        return best_score
+    else:
+        best_score = math.inf
+        for spot in get_empty_spots(b):
+            b[spot] = 'X'
+            score = minimax(b, depth + 1, True)
+            b[spot] = ' '
+            best_score = min(score, best_score)
+        return best_score
+
+def ai_move():
+    best_score = -math.inf
+    best_move = None
+    
+    for spot in get_empty_spots(board):
+        board[spot] = 'O'
+        score = minimax(board, 0, False)
+        board[spot] = ' '
+        
+        if score > best_score:
+            best_score = score
+            best_move = spot
+    
+    board[best_move] = 'O'
+    print(f'Aero plays position {best_move + 1}')
+
+def player_move():
+    while True:
+        try:
+            move = int(input('Enter your move (1-9): ')) - 1
+            if move < 0 or move > 8:
+                print('Please enter a number between 1 and 9')
+                continue
+            if board[move] != ' ':
+                print('That spot is already taken!')
+                continue
+            board[move] = 'X'
+            break
+        except ValueError:
+            print('Invalid input! Please enter a number.')
+
+# main game loop
+def play_game():
+    print("Hey! I'm Aero (your gaming dude)")
+    print('=== TIC-TAC-TOE ===')
+    print('You are X, Aero is O')
+    print('Positions are numbered 1-9:')
+    print(' 1 | 2 | 3 ')
+    print('-----------')
+    print(' 4 | 5 | 6 ')
+    print('-----------')
+    print(' 7 | 8 | 9 ')
+    
+    print_board()
+    
+    while True:
+        # player turn
+        player_move()
+        print_board()
+        
+        if check_winner(board, 'X'):
+            print('You win! Congratulations!')
+            break
+        
+        if is_board_full(board):
+            print("It's a draw!")
+            break
+        
+        # AI turn
+        print('Aero is thinking...')
+        ai_move()
+        print_board()
+        
+        if check_winner(board, 'O'):
+            print('Aero wins! Better luck next time.')
+            break
+        
+        if is_board_full(board):
+            print("It's a draw!")
+            break
+    
+    # ask to play again
+    again = input('Play again? (y/n): ').lower()
+    if again == 'y':
+        global board
+        board = [' ' for _ in range(9)]
+        play_game()
+
+if __name__ == '__main__':
+    play_game()
+
+    #Made this using Minimax algorithm for unbeatable AI gameplay
